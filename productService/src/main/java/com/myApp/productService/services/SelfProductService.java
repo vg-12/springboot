@@ -5,6 +5,7 @@ import com.myApp.productService.models.Category;
 import com.myApp.productService.models.Product;
 import com.myApp.productService.repositories.CategoryRepository;
 import com.myApp.productService.repositories.ProductRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service("selfProductService")//@Service("bean name")
+@Primary
 public class SelfProductService implements ProductService{
     private ProductRepository productRepository;
     private CategoryRepository categoryRepository;

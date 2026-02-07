@@ -2,6 +2,7 @@ package com.myApp.productService.controllers;
 
 import com.myApp.productService.exceptions.ProductNotFoundException;
 import com.myApp.productService.models.Product;
+import com.myApp.productService.repositories.ProductRepository;
 import com.myApp.productService.services.ProductService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -11,37 +12,50 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
     private ProductService productService;
+    private final ProductRepository productRepository;
+
     //@Qualifoer("bean name")// to resolve bean conflict
-    public ProductController(@Qualifier("fakestoreProductService") ProductService productService){
+    public ProductController(@Qualifier("selfProductService") ProductService productService,
+                             ProductRepository productRepository){
         this.productService=productService;
+        this.productRepository = productRepository;
     }
 //    http://localhost:8080/products/10
-    @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) throws ProductNotFoundException {
-//        ResponseEntity<Product> responseEntity=null;
-//        try{
-//
-//        Product product=productService.getSingleProduct(id);
-//        responseEntity=new ResponseEntity<>(
-//                product,
+//    @GetMapping("/{id}")
+//    public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) throws ProductNotFoundException {
+////        ResponseEntity<Product> responseEntity=null;
+////        try{
+////
+////        Product product=productService.getSingleProduct(id);
+////        responseEntity=new ResponseEntity<>(
+////                product,
+////                HttpStatus.OK
+////        );
+////        }catch (RuntimeException e){
+////         responseEntity=new ResponseEntity<>(
+////                 HttpStatus.NOT_FOUND
+////         );
+////        }
+////        throwing exception using controller advice
+//        ResponseEntity<Product> responseEntity=new ResponseEntity<>(
+//                productService.getSingleProduct(id),
 //                HttpStatus.OK
 //        );
-//        }catch (RuntimeException e){
-//         responseEntity=new ResponseEntity<>(
-//                 HttpStatus.NOT_FOUND
-//         );
-//        }
-//        throwing exception using controller advice
-        ResponseEntity<Product> responseEntity=new ResponseEntity<>(
-                productService.getSingleProduct(id),
-                HttpStatus.OK
-        );
-        return responseEntity;
+//        return responseEntity;
+//    }
+    @GetMapping("/{id}")
+    public Product getProductById(@PathVariable("id") Long id) throws ProductNotFoundException {
+        Optional<Product> product=productRepository.findById(id);
+        if (product.isEmpty()) {
+            throw new ProductNotFoundException("product not found");
+        }
+        return product.get();
     }
 
     @GetMapping()
