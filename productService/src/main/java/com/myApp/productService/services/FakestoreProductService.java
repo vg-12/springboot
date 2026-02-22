@@ -4,6 +4,7 @@ import com.myApp.productService.dtos.FakestoreProductDto;
 import com.myApp.productService.exceptions.ProductNotFoundException;
 import com.myApp.productService.models.Category;
 import com.myApp.productService.models.Product;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,11 +23,12 @@ public class FakestoreProductService implements ProductService{
 
     private RestTemplate restTemplate;
     private RedisTemplate<String, Object> redisTemplate;
+    private RestTemplate loadBalancedRestTemplate;
 
-
-    public FakestoreProductService(RestTemplate restTemplate, RedisTemplate redisTemplate){
+    public FakestoreProductService(@Qualifier("getRestTemplate") RestTemplate restTemplate, RedisTemplate redisTemplate,  @Qualifier("loadBalancedRestTemplate") RestTemplate loadBalancedRestTemplate){
         this.restTemplate=restTemplate;
         this.redisTemplate= redisTemplate;
+        this.loadBalancedRestTemplate=loadBalancedRestTemplate;
     }
 
     @Override
@@ -64,8 +66,34 @@ public class FakestoreProductService implements ProductService{
 //        throw new ArrayIndexOutOfBoundsException();
 //    }
 
+//    @Override
+//    public List<Product> getAllProducts() {
+////        we are not using list because of the concept of type erasure as after java 5 launch list is expected to have a type at compile time and at runtime it removes the type and considered as just List object and since the api call is made at runtime, the List<FakestoreProductDto>.class get the type in the list hence gives error
+////        List<FakestoreProductDto> fakestoreProductDtos=restTemplate.getForObject(
+////                "https://fakestoreapi.com/products",
+////                List<FakestoreProductDto>.class
+//        FakestoreProductDto[] fakestoreProductDtos=restTemplate.getForObject(
+//                "https://fakestoreapi.com/products",
+//                FakestoreProductDto[].class
+//        );
+//        //convert list of fakeStoreProductDto into list of product
+//        List<Product> products=new ArrayList<>();
+//        for(FakestoreProductDto fakestoreProductDto:fakestoreProductDtos){
+//            products.add(convertFakestoreProductToProduct(fakestoreProductDto));
+//        }
+//        return products;
+//    }
+
+//FOR EUREKA SERVER
     @Override
     public List<Product> getAllProducts() {
+        loadBalancedRestTemplate.getForObject(
+//               "http://localhost:8180/users/sample",
+//                -> instead of hardcoding the port number we will get those from service discovery
+//             userservice is present in eureka server
+                "http://userservice/users/sample",
+                Void.class
+        );
 //        we are not using list because of the concept of type erasure as after java 5 launch list is expected to have a type at compile time and at runtime it removes the type and considered as just List object and since the api call is made at runtime, the List<FakestoreProductDto>.class get the type in the list hence gives error
 //        List<FakestoreProductDto> fakestoreProductDtos=restTemplate.getForObject(
 //                "https://fakestoreapi.com/products",

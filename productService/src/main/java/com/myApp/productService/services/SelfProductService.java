@@ -32,6 +32,7 @@ public class SelfProductService implements ProductService{
         if (productOptional.isEmpty()){
             throw new ProductNotFoundException("Product with id: "+ productId+ " does'nt exist");
         }
+//        call user service before returning the product
         return productOptional.get();
     }
 

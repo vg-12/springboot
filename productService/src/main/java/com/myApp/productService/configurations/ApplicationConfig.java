@@ -1,6 +1,7 @@
 package com.myApp.productService.configurations;
 
 
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -22,4 +23,11 @@ public class ApplicationConfig {
        redisTemplate.setConnectionFactory(redisConnectionFactory);
        return redisTemplate;
     }
+
+    @Bean
+    @LoadBalanced//since user service has multiple instances running we want only 1 to be taken at time hence we use LoadBalanced annotation
+    public RestTemplate loadBalancedRestTemplate() {
+        return new RestTemplate();
+    }
+
 }

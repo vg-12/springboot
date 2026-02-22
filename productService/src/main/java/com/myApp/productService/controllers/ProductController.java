@@ -20,8 +20,8 @@ public class ProductController {
     private ProductService productService;
     private final ProductRepository productRepository;
 
-    //@Qualifoer("bean name")// to resolve bean conflict
-    public ProductController(@Qualifier("selfProductService") ProductService productService,
+    //@Qualifier("bean name")// to resolve bean conflict
+    public ProductController(@Qualifier("fakestoreProductService") ProductService productService,
                              ProductRepository productRepository){
         this.productService=productService;
         this.productRepository = productRepository;
@@ -52,6 +52,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable("id") Long id) throws ProductNotFoundException {
         Optional<Product> product=productRepository.findById(id);
+        System.out.println(product);
         if (product.isEmpty()) {
             throw new ProductNotFoundException("product not found");
         }
